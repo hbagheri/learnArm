@@ -19,6 +19,7 @@ from rapidfuzz.distance import Levenshtein
 
 from app.lessons import router as lessons_router
 from app.admin import router as admin_router
+from app.curriculum import router as curriculum_router
 from app.database import init_db
 
 MODEL_DIR = Path(os.getenv("MODEL_DIR", "/app/models"))
@@ -53,6 +54,7 @@ init_db()
 
 app.include_router(lessons_router)
 app.include_router(admin_router)
+app.include_router(curriculum_router)
 
 
 @app.get("/health")
