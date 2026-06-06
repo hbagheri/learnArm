@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit Lesson' if lesson else 'New Lesson' }} - LearnArm Admin{% endblock %}
+
+{% block nav_lessons %}active{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>{{ 'Edit Lesson' if lesson else 'New Lesson' }}</h2>
+
+    <form method="POST" style="max-width: 600px;">
+        <div class="form-group">
+            <label for="title_fa">Title (Persian)</label>
+            <input type="text" id="title_fa" name="title_fa" value="{{ lesson.title_fa if lesson else '' }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="subtitle_fa">Subtitle (Persian)</label>
+            <input type="text" id="subtitle_fa" name="subtitle_fa" value="{{ lesson.subtitle_fa if lesson else '' }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="module_key">Module Key</label>
+            <input type="text" id="module_key" name="module_key" value="{{ lesson.module_key if lesson else '' }}" placeholder="e.g., alphabet, greetings, taxi" required>
+            <small style="color: #7f8c8d; display: block; margin-top: 0.5rem;">Identifier for lesson grouping</small>
+        </div>
+
+        <div class="form-group">
+            <label for="order_index">Order Index</label>
+            <input type="number" id="order_index" name="order_index" value="{{ lesson.order_index if lesson else 0 }}" required>
+            <small style="color: #7f8c8d; display: block; margin-top: 0.5rem;">Position in lesson list (0 = first)</small>
+        </div>
+
+        <div class="form-group">
+            <label for="est_minutes">Estimated Duration (minutes)</label>
+            <input type="number" id="est_minutes" name="est_minutes" value="{{ lesson.est_minutes if lesson else 5 }}" min="1" required>
+        </div>
+
+        <div class="form-group">
+            <label for="is_published">
+                <input type="checkbox" id="is_published" name="is_published" value="true" {% if lesson and lesson.is_published %}checked{% endif %}>
+                Publish Lesson
+            </label>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-success">{{ 'Save' if lesson else 'Create' }}</button>
+            <a href="/admin/lessons" class="btn" style="background: #7f8c8d;">Cancel</a>
+        </div>
+
+        {% if lesson %}
+        <div style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+            <p style="color: #7f8c8d; font-size: 0.9rem; margin-bottom: 0.5rem;">Lesson ID: {{ lesson.id }}</p>
+            <p style="color: #7f8c8d; font-size: 0.9rem;">Created: {{ lesson.created_at.strftime('%Y-%m-%d %H:%M') if lesson.created_at else 'N/A' }}</p>
+        </div>
+        {% endif %}
+    </form>
+</div>
+
+{% if lesson %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2>Steps</h2>
+        <a href="/admin/lessons/{{ lesson.id }}/steps/new" class="btn btn-success">+ Add Step</a>
+    </div>
+
+    {% if lesson.steps %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Order</th>
+                    <th>Type</th>
+                    <th>Item Key</th>
+                    <th>Prompt</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for step in lesson.steps|sort(attribute='order_index') %}
+                    <tr>
+                        <td>{{ step.order_index }}</td>
+                        <td><code>{{ step.step_type }}</code></td>
+                        <td><code>{{ step.item_key }}</code></td>
+                        <td>{{ step.prompt_fa or '—' }}</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="/admin/lessons/{{ lesson.id }}/steps/{{ step.id }}/edit" class="btn btn-primary btn-small">Edit</a>
+                                <a href="/admin/lessons/{{ lesson.id }}/steps/{{ step.id }}/delete" class="btn btn-danger btn-small" onclick="return confirm('Are you sure?')">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-state">
+            <p>No steps yet. Add a step to this lesson.</p>
+            <a href="/admin/lessons/{{ lesson.id }}/steps/new" class="btn btn-success">+ Add Step</a>
+        </div>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - LearnArm Admin{% endblock %}
+
+{% block nav_home %}active{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Welcome to LearnArm Admin</h2>
+    <p>Manage lessons and content for the LearnArm language learning app.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    <div class="card">
+        <h3 style="margin-bottom: 1rem; color: #2c3e50;">{{ lesson_count }}</h3>
+        <p style="color: #7f8c8d;">Total Lessons</p>
+        <a href="/admin/lessons" class="btn btn-primary" style="margin-top: 1rem;">Manage Lessons</a>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-bottom: 1rem; color: #2c3e50;">{{ step_count }}</h3>
+        <p style="color: #7f8c8d;">Total Steps</p>
+        <p style="color: #95a5a6; font-size: 0.9rem;">Across all lessons</p>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-bottom: 1rem; color: #27ae60;">{{ published_count }}</h3>
+        <p style="color: #7f8c8d;">Published</p>
+        <p style="color: #95a5a6; font-size: 0.9rem;">Ready for students</p>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-bottom: 1rem; color: #f39c12;">{{ draft_count }}</h3>
+        <p style="color: #7f8c8d;">Draft</p>
+        <p style="color: #95a5a6; font-size: 0.9rem;">In progress</p>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Recent Lessons</h2>
+    {% if recent_lessons %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Module</th>
+                    <th>Steps</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lesson in recent_lessons[:5] %}
+                    <tr>
+                        <td><a href="/admin/lessons/{{ lesson.id }}" style="color: #3498db; text-decoration: none;">{{ lesson.title_fa }}</a></td>
+                        <td>{{ lesson.module_key }}</td>
+                        <td>{{ lesson.steps|length }}</td>
+                        <td>
+                            {% if lesson.is_published %}
+                                <span style="color: #27ae60;">✓ Published</span>
+                            {% else %}
+                                <span style="color: #f39c12;">⚙ Draft</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-state" style="padding: 1.5rem;">
+            <p>No lessons yet. <a href="/admin/lessons/new" style="color: #3498db;">Create your first lesson</a> to get started.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

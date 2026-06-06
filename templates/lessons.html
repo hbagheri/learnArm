@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Lessons - LearnArm Admin{% endblock %}
+
+{% block nav_lessons %}active{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2>Lessons</h2>
+        <a href="/admin/lessons/new" class="btn btn-success">+ New Lesson</a>
+    </div>
+
+    {% if lessons %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Module</th>
+                    <th>Order</th>
+                    <th>Steps</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lesson in lessons %}
+                    <tr>
+                        <td>{{ lesson.title_fa }}</td>
+                        <td>{{ lesson.module_key }}</td>
+                        <td>{{ lesson.order_index }}</td>
+                        <td>{{ lesson.steps|length }}</td>
+                        <td>
+                            {% if lesson.is_published %}
+                                <span style="color: #27ae60; font-weight: 600;">✓ Published</span>
+                            {% else %}
+                                <span style="color: #f39c12; font-weight: 600;">⚙ Draft</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="/admin/lessons/{{ lesson.id }}" class="btn btn-primary btn-small">Edit</a>
+                                <a href="/admin/lessons/{{ lesson.id }}/delete" class="btn btn-danger btn-small" onclick="return confirm('Are you sure?')">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty-state">
+            <p>No lessons yet. Create your first lesson to get started.</p>
+            <a href="/admin/lessons/new" class="btn btn-success">+ New Lesson</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

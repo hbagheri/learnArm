@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit Step' if step else 'New Step' }} - LearnArm Admin{% endblock %}
+
+{% block nav_lessons %}active{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>{{ 'Edit Step' if step else 'New Step' }} - {{ lesson.title_fa }}</h2>
+
+    <form method="POST" style="max-width: 600px;">
+        <div class="form-group">
+            <label for="step_type">Step Type</label>
+            <select id="step_type" name="step_type" required>
+                <option value="">Select a type...</option>
+                <option value="SHOW_LETTER" {% if step and step.step_type == 'SHOW_LETTER' %}selected{% endif %}>SHOW_LETTER - Display a letter</option>
+                <option value="QUIZ_LETTER" {% if step and step.step_type == 'QUIZ_LETTER' %}selected{% endif %}>QUIZ_LETTER - Letter quiz</option>
+                <option value="SHOW_PHRASE" {% if step and step.step_type == 'SHOW_PHRASE' %}selected{% endif %}>SHOW_PHRASE - Display a phrase</option>
+                <option value="QUIZ_PHRASE" {% if step and step.step_type == 'QUIZ_PHRASE' %}selected{% endif %}>QUIZ_PHRASE - Phrase quiz</option>
+                <option value="PRACTICE_PHRASE" {% if step and step.step_type == 'PRACTICE_PHRASE' %}selected{% endif %}>PRACTICE_PHRASE - Pronunciation practice</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="item_key">Item Key</label>
+            <input type="text" id="item_key" name="item_key" value="{{ step.item_key if step else '' }}" placeholder="e.g., letter:1 or phrase:42" required>
+            <small style="color: #7f8c8d; display: block; margin-top: 0.5rem;">Reference to content (format: type:id)</small>
+        </div>
+
+        <div class="form-group">
+            <label for="order_index">Order Index</label>
+            <input type="number" id="order_index" name="order_index" value="{{ step.order_index if step else 0 }}" required>
+            <small style="color: #7f8c8d; display: block; margin-top: 0.5rem;">Position in lesson (0 = first)</small>
+        </div>
+
+        <div class="form-group">
+            <label for="prompt_fa">Prompt (Persian)</label>
+            <textarea id="prompt_fa" name="prompt_fa" placeholder="Optional instruction text">{{ step.prompt_fa if step else '' }}</textarea>
+            <small style="color: #7f8c8d; display: block; margin-top: 0.5rem;">Optional instruction shown to learner</small>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-success">{{ 'Save' if step else 'Create' }}</button>
+            <a href="/admin/lessons/{{ lesson.id }}" class="btn" style="background: #7f8c8d;">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
