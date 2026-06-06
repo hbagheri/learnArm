@@ -4,7 +4,10 @@ Bump CONTENT_VERSION whenever the payload below changes — the client uses it
 to detect whether to re-sync.
 """
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+from app.database import get_db
+from app.models import Lesson
 
 router = APIRouter(prefix="/content", tags=["content"])
 
@@ -140,12 +143,42 @@ LESSONS = [
 ]
 
 
+def _lesson_to_dict(lesson: Lesson) -> dict:
+    """Convert database lesson model to API response format."""
+    return {
+        "id": lesson.id,
+        "orderIndex": lesson.order_index,
+        "moduleKey": lesson.module_key,
+        "titleFa": lesson.title_fa,
+        "subtitleFa": lesson.subtitle_fa,
+        "estMinutes": lesson.est_minutes,
+        "prerequisiteIds": [],  # TODO: parse from prerequisites JSON
+        "steps": [
+            {
+                "orderIndex": step.order_index,
+                "type": step.step_type,
+                "itemKey": step.item_key,
+                "promptFa": step.prompt_fa,
+            }
+            for step in sorted(lesson.steps, key=lambda s: s.order_index)
+        ],
+    }
+
+
 @router.get("/lessons")
-def get_lessons():
+def get_lessons(db: Session = Depends(get_db)):
+    """Get all lessons (from database if available, fallback to hardcoded)."""
+    db_lessons = db.query(Lesson).filter(Lesson.is_published == True).order_by(Lesson.order_index).all()
+
+    if db_lessons:
+        lessons = [_lesson_to_dict(lesson) for lesson in db_lessons]
+    else:
+        lessons = LESSONS
+
     return {
         "version": CONTENT_VERSION,
         "extraPhrases": EXTRA_PHRASES,
-        "lessons": LESSONS,
+        "lessons": lessons,
     }
 
 
