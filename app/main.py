@@ -16,6 +16,8 @@ from piper import PiperVoice
 from rapidfuzz.distance import Levenshtein
 
 from app.lessons import router as lessons_router
+from app.admin import router as admin_router
+from app.database import init_db
 
 MODEL_DIR = Path(os.getenv("MODEL_DIR", "/app/models"))
 PIPER_MODEL_PATH = MODEL_DIR / "hy_AM-gor-medium.onnx"
@@ -45,7 +47,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+init_db()
+
 app.include_router(lessons_router)
+app.include_router(admin_router)
 
 
 @app.get("/health")
