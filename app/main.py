@@ -95,7 +95,18 @@ def _synthesize_to_mp3(text: str, mp3_path: Path) -> None:
         wav_path = Path(tmp.name)
     try:
         with wave.open(str(wav_path), "wb") as wav_file:
-            piper_voice.synthesize(text, wav_file)
+            # Tuning for clarity on hy_AM-gor-medium, which renders initial labial
+            # consonants (m / b / p) muddly at default settings:
+            #   length_scale > 1.0 = slower speech, sharper consonants
+            #   noise_scale < default (~0.667) = more consistent voice
+            #   noise_w < default (~0.8) = less duration jitter
+            piper_voice.synthesize(
+                text,
+                wav_file,
+                length_scale=1.2,
+                noise_scale=0.5,
+                noise_w=0.7,
+            )
         _wav_to_mp3(wav_path, mp3_path)
     finally:
         wav_path.unlink(missing_ok=True)
